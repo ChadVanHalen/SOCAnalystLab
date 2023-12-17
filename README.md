@@ -44,57 +44,55 @@ Confirmed Sliver could see session from Windows VM, poking around victim compute
 <img src="https://i.postimg.cc/VNjCGcb9/9-ps-T.png" height="80%" width="80%" alt="SOC Analyst Lab"/>
 <br />
 <br />
-The Endpoint Detetction and Response software used is LimaCharlie, here we can see the connections to our endpoint that are signed, and unsigned:  <br/>
+The Endpoint Detetction and Response software used is LimaCharlie, here I can see the connections to the endpoint that are signed, and unsigned:  <br/>
 <img src="https://i.postimg.cc/xCnbBFKw/10-Lima-Charlie-signed-and-unsigned-processes.png" height="80%" width="80%" alt="SOC Analyst Lab"/>
 <br />
 <br />
-We are able to look at the unsigned connection's network information, and check for all events relating to that IP:  <br/>
+I am able to look at the unsigned connection's network information, and check for all events relating to that IP:  <br/>
 <img src="https://i.postimg.cc/WzfFFNQV/11-Malware-network-connections.png" height="80%" width="80%" alt="SOC Analyst Lab"/>
  <img src="https://i.postimg.cc/RVNnrtHZ/12-Lima-Charlie-Network.png" height="80%" width="80%" alt="SOC Analyst Lab"/>
  <img src="https://i.postimg.cc/RZt6hzGr/13-Lima-Charlie-Network-IP.png" height="80%" width="80%" alt="SOC Analyst Lab"/>
 <br />
 <br />
-We are also able to inspect the hash of the file related to the unsigned connection, and compare it to VirusTotal for known malware (since this isn't known malware and was just created by us, VT comes up with no results):  <br/>
+I am also able to inspect the hash of the file related to the unsigned connection, and compare it to VirusTotal for known malware (since this isn't known malware and was just created by us, VT comes up with no results):  <br/>
 <img src="https://i.postimg.cc/FFPJnp16/14-Inspect-hash.png" height="80%" width="80%" alt="SOC Analyst Lab"/>
 <img src="https://i.postimg.cc/xThN9dvy/15-Virus-Total-hash-result.png" height="80%" width="80%" alt="SOC Analyst Lab"/>
  <br />
 <br />
-From the attacker we will run a common process attackers will use to steal system credentials, lsass, then identify the event in our EDR:  <br/>
+From the attacker I will run a common process attackers will use to steal system credentials, lsass, then identify the event in the EDR:  <br/>
 <img src="https://i.postimg.cc/JnggxgHL/1-Reconnect-C2-run-lsass-dump.png" height="80%" width="80%" alt="SOC Analyst Lab"/>
 <img src="https://i.postimg.cc/9QpnKzw1/2-Finding-lsass-event-in-EDR.png" height="80%" width="80%" alt="SOC Analyst Lab"/>
 <br />
 <br />
-Now we build a Detection and Response rule to address the lsass dump  <br/>
+Now I will build a Detection and Response rule to address the lsass dump  <br/>
 LimaCharlie lets you create rules directly from an event, like so:   <br/>
 <img src="https://i.postimg.cc/qBPSCPdc/3-Build-D-R-rule.png" height="80%" width="80%" alt="SOC Analyst Lab"/>
  <br />
 <br />
-We will input these rules for detection and the response. The detection rule is defining an operation take place whenever an event ends with the "lsass.exe" in the /TARGET/FILE_PATH path. <br/>
-The response is that it will generate a report named LSASS access
+I will input these rules for detection and the response. The detection rule is defining an operation take place whenever an event ends with the "lsass.exe" in the /TARGET/FILE_PATH path. <br/>
+The response is that it will generate a report named LSASS access <br/>
 <img src="https://i.postimg.cc/SRMPvrcz/4-Adding-D-R-rules.png" height="80%" width="80%" alt="SOC Analyst Lab"/> <br/>
  <br/>
-Under the creation of the rule, we can test that rule against the original event. The EDR will let us know that the event would be caught by the rules we laid out with the green text at the bottom.<br/>If the rules had no effect, they would appear red
+Under the creation of the rule, I can test that rule against the original event. The EDR will let us know that the event would be caught by the rules I laid out with the green text at the bottom.<br/>If the rules had no effect, they would appear red
  <br/>
 <img src="https://i.postimg.cc/KvtV70Z6/5-Testing-rules-against-event.png" height="80%" width="80%" alt="SOC Analyst Lab"/>
   <br />
 <br />
-Running lsass again from the attacker, we can see it detected from the EDR
+Running lsass again from the attacker, I can see it detected from the EDR <br/>
 <img src="https://i.postimg.cc/HkHN6bnV/7-Run-lsass-again-it-is-detecected-on-EDR.png" height="80%" width="80%" alt="SOC Analyst Lab"/>
-
 <br />
 <br />
-Next we run a very basic version of another well known attack, deleting volume shadow copies, which aids in the implmentation of ransomware  <br/>
-Here we see the command run from teh attacker, and the detection from the EDR<br/>
+Next I run a very basic version of another well known attack, deleting volume shadow copies, which aids in the implmentation of ransomware  <br/>
+Here I see the command run from the attacker, and the detection from the EDR<br/>
 <img src="https://i.postimg.cc/63rhFmyR/1-Delete-volume-shadow-copies.png" height="80%" width="80%" alt="SOC Analyst Lab"/>
 <img src="https://i.postimg.cc/022CHZxM/2-Detection-in-EDR.png" height="80%" width="80%" alt="SOC Analyst Lab"/><br/><br/>
 Within the event, the EDR gives references to why this event was automatically detected, linking to resources describing legitimate and illegitimate Shadow Copy deletion examples<br/>
 <img src="https://i.postimg.cc/ry9JJ762/3-EDR-giving-references-on-why-it-is-detected.png" height="80%" width="80%" alt="SOC Analyst Lab"/><br/><br/>
-Here we are crafting rules to report and now also deny the process
+Here I am crafting rules to report and now also deny the process
 <img src="https://i.postimg.cc/vTGvytVK/4-EDR-response-rule.png" height="80%" width="80%" alt="SOC Analyst Lab"/><br/><br/>
-This shows the attacker side completing a shadow copy delete and able to run whoami, confirming a connection, before we added the rule.<br/>
-Then underneath it we can see running the shadow copy delete command again leads our whoami command to return that the shell exited, aka our connection was killed
+This shows the attacker side completing a shadow copy delete and able to run whoami, confirming a connection, before I added the rule.<br/>
+Then underneath it I can see running the shadow copy delete command again leads the whoami command to return that the shell exited, aka my connection was killed <br/>
 <img src="https://i.postimg.cc/d3njVZRV/5-Volume-shadow-delete-attempt-after-EDR-rule.png" height="80%" width="80%" alt="SOC Analyst Lab"/>
-
 <br />
 <br />
 The next demonstration is in regard to false positives, and how to fine tune the detection rules to lessen or eliminate them  <br/>
@@ -102,44 +100,35 @@ Below is a demonstration of a broad rule that is creating an alert from very com
 The output in the EDR shows many events that match the criteria, which were just from the reboot of the Windows VM<br/>
 <img src="https://i.postimg.cc/59vw7GZ2/1-Purposefuly-broad-detection-rule.png" height="80%" width="80%" alt="SOC Analyst Lab"/>
 <img src="https://i.postimg.cc/7hyTrHpY/2-Demo-of-false-positives-from-broad-rule.png" height="80%" width="80%" alt="SOC Analyst Lab"/><br/><br/>
-Pulling one of these events, we can see the process includes the expected file path for a normal svchost, and expected command line arguments from a normal svchost   
+Pulling one of these events, I can see the process includes the expected file path for a normal svchost, and expected command line arguments from a normal svchost <br/>
 <img src="https://i.postimg.cc/zBhRQb2c/3-Expected-file-path-from-a-normal-svchost.png" height="80%" width="80%" alt="SOC Analyst Lab"/>
 <img src="https://i.postimg.cc/nLgDTY2m/4-Expected-command-line-arguments-from-a-normal-svchost.png" height="80%" width="80%" alt="SOC Analyst Lab"/><br/><br/>
-When marking an event as a false positive in LimaCharlie, below are the suggested edits it puts forth to help us tune the false positive.
+When marking an event as a false positive in LimaCharlie, below are the suggested edits it puts forth to help us tune the false positive. <br/>
 <img src="https://i.postimg.cc/5NS81z9c/5-Automatic-false-positive-tuning-suggestions-from-EDR.png" height="80%" width="80%" alt="SOC Analyst Lab"/><br/><br/>
-However, we want to fine tune even further. The scvhost command will always use the -k argumnet, but the other arguments might change. So by getting rid of the other arguments and just focusing on -k, we can be sure we aren't catching any false positives from normal commands that are slightly different<br/>
-We also get rid of the auto-generated hash and hostname detection rules, since something as basic as an OS update could potentially change the hash of svchost, causing further false positives.
+However, I want to fine tune even further. The scvhost command will always use the -k argumnet, but the other arguments might change. So by getting rid of the other arguments and just focusing on -k, I can be sure I'm not catching any false positives from normal commands that are slightly different<br/>
+I also get rid of the auto-generated hash and hostname detection rules, since something as basic as an OS update could potentially change the hash of svchost, causing further false positives. <br/>
 <img src="https://i.postimg.cc/ZKS61HSF/6-Fine-tuned-false-positive-tuning.png" height="80%" width="80%" alt="SOC Analyst Lab"/><br/><br/>
-Grabbing a false positive event, we can test the rules to see the rules would have caught that false positive
+Grabbing a false positive event, I can test the rules to see the rules would have caught that false positive <br/>
 <img src="https://i.postimg.cc/GpHDkSFr/7-Testing-rule-against-previous-detection.png" height="80%" width="80%" alt="SOC Analyst Lab"/><br/><br/>
-After clearing the detections, then rebooting the VM again, we can see the previously detetced svchosts are no longer being detetced
+After clearing the detections, then rebooting the VM again, I can see the previously detetced svchosts are no longer being detetced <br/>
 <img src="https://i.postimg.cc/sgf7221M/8-Confirm-no-more-false-positives.png" height="80%" width="80%" alt="SOC Analyst Lab"/>
-
 <br />
 <br />
-
 The final demonstration is creating YARA rules in the EDR and then automating those rules  <br/>
 Sliver YARA rules I am using were published by the UK NCSC in a PDF found [here](https://www.ncsc.gov.uk/files/Advisory-further-TTPs-associated-with-SVR-cyber-actors.pdf)
 <img src="https://i.postimg.cc/9MxZZ5SW/1-Creating-YARA-rules-for-sliver.png" height="80%" width="80%" alt="SOC Analyst Lab"/>
 <img src="https://i.postimg.cc/VvdMFZQX/2-YARA-DR-Rule.png" height="80%" width="80%" alt="SOC Analyst Lab"/><br/><br/>
-After running the payload on the Windows VM again, we can see the detection on the EDR after we manually scan for it via the console
+After running the payload on the Windows VM again, I can see the detection on the EDR after I manually scan for it via the console <br/>
 <img src="https://i.postimg.cc/VvdMFZQX/2-YARA-DR-Rule.png" height="80%" width="80%" alt="SOC Analyst Lab"/>
 <img src="https://i.postimg.cc/c4twgzcS/4-YARA-Detection.png" height="80%" width="80%" alt="SOC Analyst Lab"/><br/><br/>
-Now to automate it, we create an automation rule in the EDR. Here we will say that a new document appearing in the downloads folder with an EXE extension will trigger both a report, and our YARA scan
+Now to automate it, I will create an automation rule in the EDR. Here I will say that a new document appearing in the downloads folder with an EXE extension will trigger both a report, and my YARA scan <br/>
 <img src="https://i.postimg.cc/Vkjt4bTZ/5-Automate-scan-for-new-EXE.png" height="80%" width="80%" alt="SOC Analyst Lab"/>
 <img src="https://i.postimg.cc/sgFSpJnZ/6-Automate-scan-for-new-process-from-Downloads.png" height="80%" width="80%" alt="SOC Analyst Lab"/><br/><br/>
-Here we will move our malware on the Windows computer out of the downloads folder, into the documents folder, then back into downloads folder. This will trigger one of the rules we just created, then running the program will trigger the other rule
+Here I will move my malware on the Windows computer out of the downloads folder, into the documents folder, then back into downloads folder. This will trigger one of the rules I just created, then running the program will trigger the other rule <br/>
 <img src="https://i.postimg.cc/N0DHvvQ1/7-Moving-malware-out-of-then-back-into-Downloads-to-trigger-detection.png" height="80%" width="80%" alt="SOC Analyst Lab"/><br/><br/>
-As you can see, both actions were detected automatically, as opposed to manually running the YARA scan from the previous step
+As you can see, both actions were detected automatically, as opposed to manually running the YARA scan from the previous step <br/>
 <img src="https://i.postimg.cc/RCDw0mKd/8-YARA-Detections-in-EDR.png" height="80%" width="80%" alt="SOC Analyst Lab"/>
 <img src="https://i.postimg.cc/N0BHnjvs/9-YARA-Detections-from-running-EXE.png" height="80%" width="80%" alt="SOC Analyst Lab"/>
-
-
-<br />
-<br />
-Observe the wiped disk:  <br/>
-<img src="https://i.imgur.com/AeZkvFQ.png" height="80%" width="80%" alt="Disk Sanitization Steps"/>
-</p>
 
 <!--
  ```diff
