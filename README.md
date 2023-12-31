@@ -54,7 +54,7 @@ I am able to look at the unsigned connection's network information, and check fo
  <img src="https://i.postimg.cc/RZt6hzGr/13-Lima-Charlie-Network-IP.png" height="80%" width="80%" alt="SOC Analyst Lab"/>
 <br />
 <br />
-I am also able to inspect the hash of the file related to the unsigned connection, and compare it to VirusTotal for known malware (since this isn't known malware and was just created by us, VT comes up with no results):  <br/>
+I am also able to inspect the hash of the file related to the unsigned connection, and compare it to VirusTotal for known malware (since this isn't known malware and was just created by me, VT comes up with no results):  <br/>
 <img src="https://i.postimg.cc/FFPJnp16/14-Inspect-hash.png" height="80%" width="80%" alt="SOC Analyst Lab"/>
 <img src="https://i.postimg.cc/xThN9dvy/15-Virus-Total-hash-result.png" height="80%" width="80%" alt="SOC Analyst Lab"/>
  <br />
@@ -73,7 +73,7 @@ I will input these rules for detection and the response. The detection rule is d
 The response is that it will generate a report named LSASS access <br/>
 <img src="https://i.postimg.cc/SRMPvrcz/4-Adding-D-R-rules.png" height="80%" width="80%" alt="SOC Analyst Lab"/> <br/>
  <br/>
-Under the creation of the rule, I can test that rule against the original event. The EDR will let us know that the event would be caught by the rules I laid out with the green text at the bottom.<br/>If the rules had no effect, they would appear red
+Under the creation of the rule, I can test that rule against the original event. The EDR will let me know that the event would be caught by the rules I laid out with the green text at the bottom.<br/>If the rules had no effect, they would appear red
  <br/>
 <img src="https://i.postimg.cc/KvtV70Z6/5-Testing-rules-against-event.png" height="80%" width="80%" alt="SOC Analyst Lab"/>
   <br />
@@ -103,7 +103,7 @@ The output in the EDR shows many events that match the criteria, which were just
 Pulling one of these events, I can see the process includes the expected file path for a normal svchost, and expected command line arguments from a normal svchost <br/>
 <img src="https://i.postimg.cc/zBhRQb2c/3-Expected-file-path-from-a-normal-svchost.png" height="80%" width="80%" alt="SOC Analyst Lab"/>
 <img src="https://i.postimg.cc/nLgDTY2m/4-Expected-command-line-arguments-from-a-normal-svchost.png" height="80%" width="80%" alt="SOC Analyst Lab"/><br/><br/>
-When marking an event as a false positive in LimaCharlie, below are the suggested edits it puts forth to help us tune the false positive. <br/>
+When marking an event as a false positive in LimaCharlie, below are the suggested edits it puts forth to help me tune the false positive. <br/>
 <img src="https://i.postimg.cc/5NS81z9c/5-Automatic-false-positive-tuning-suggestions-from-EDR.png" height="80%" width="80%" alt="SOC Analyst Lab"/><br/><br/>
 However, I want to fine tune even further. The scvhost command will always use the -k argumnet, but the other arguments might change. So by getting rid of the other arguments and just focusing on -k, I can be sure I'm not catching any false positives from normal commands that are slightly different<br/>
 I also get rid of the auto-generated hash and hostname detection rules, since something as basic as an OS update could potentially change the hash of svchost, causing further false positives. <br/>
